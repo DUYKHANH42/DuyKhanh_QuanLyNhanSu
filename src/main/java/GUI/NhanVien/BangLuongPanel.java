@@ -15,6 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+import util.ExportUtils;
 
 /**
  *
@@ -24,6 +25,7 @@ public class BangLuongPanel extends javax.swing.JPanel {
 
     private LuongBUS luongBUS = new LuongBUS();
     int ngayCongChuan = 26;
+    String maNV = getCurrentMaNV();
 
     /**
      * Creates new form BangLuongPanel
@@ -51,7 +53,8 @@ public class BangLuongPanel extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         btnLoc = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
+        btnXuatExcel = new javax.swing.JButton();
+        btnXuatPDF = new javax.swing.JButton();
 
         tblLuong.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -114,7 +117,19 @@ public class BangLuongPanel extends javax.swing.JPanel {
                 .addGap(27, 27, 27))
         );
 
-        jButton1.setText("Xem Chi Tiết");
+        btnXuatExcel.setText("Xuất Excel");
+        btnXuatExcel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnXuatExcelActionPerformed(evt);
+            }
+        });
+
+        btnXuatPDF.setText("Xuất PDF");
+        btnXuatPDF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnXuatPDFActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -124,16 +139,20 @@ public class BangLuongPanel extends javax.swing.JPanel {
             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1)
-                .addGap(52, 52, 52))
+                .addComponent(btnXuatExcel)
+                .addGap(18, 18, 18)
+                .addComponent(btnXuatPDF)
+                .addGap(63, 63, 63))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 8, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnXuatExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnXuatPDF, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -142,7 +161,7 @@ public class BangLuongPanel extends javax.swing.JPanel {
         try {
             int thang = Integer.parseInt(cboThang.getSelectedItem().toString());
             int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
-            String maNV = getCurrentMaNV();
+
             LuongBUS luongBUS = new LuongBUS();
             Luong luong = luongBUS.getByThangNam(maNV, thang, nam);
 
@@ -162,7 +181,6 @@ public class BangLuongPanel extends javax.swing.JPanel {
                 };
                 model.addRow(row);
             }
-
             tblLuong.setModel(model);
         } catch (Exception e) {
             e.printStackTrace();
@@ -171,12 +189,41 @@ public class BangLuongPanel extends javax.swing.JPanel {
 
     }//GEN-LAST:event_btnLocActionPerformed
 
+    private void btnXuatExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXuatExcelActionPerformed
+        // TODO add your handling code here:
+        try {
+
+            int thang = Integer.parseInt(cboThang.getSelectedItem().toString());
+            int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
+            String filePath = "D:\\DuLieu\\Luong_" + maNV + "_" + thang + "_" + nam + ".xlsx";
+            ExportUtils.exportToExcel(tblLuong, filePath);
+
+            JOptionPane.showMessageDialog(this, "Xuất Excel thành công: " + filePath);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xuất Excel: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnXuatExcelActionPerformed
+
+    private void btnXuatPDFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnXuatPDFActionPerformed
+        // TODO add your handling code here:
+        try {
+            int thang = Integer.parseInt(cboThang.getSelectedItem().toString());
+            int nam = Integer.parseInt(cboNam.getSelectedItem().toString());
+            String filePath = "D:\\DuLieu\\Luong_" + maNV + "_" + thang + "_" + nam + ".pdf";
+            ExportUtils.exportToPDF(tblLuong, filePath, "BÁO CÁO LƯƠNG THÁNG " + thang + " NĂM " + nam);
+            JOptionPane.showMessageDialog(this, "Xuất PDF thành công: " + filePath);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Lỗi khi xuất PDF: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnXuatPDFActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnLoc;
+    private javax.swing.JButton btnXuatExcel;
+    private javax.swing.JButton btnXuatPDF;
     private javax.swing.JComboBox cboNam;
     private javax.swing.JComboBox cboThang;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
